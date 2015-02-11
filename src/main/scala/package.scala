@@ -1,7 +1,7 @@
 import rx.lang.scala.Observable
 import rx.lang.scala.subjects.ReplaySubject
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Random, Failure, Success, Try}
 
 /**
  * Created by maximilianofelice on 07/02/15.
@@ -44,6 +44,22 @@ package object TrickMe {
    *              ([[ProjectInfo]], [[Try[T]]) for streaming.
    */
   trait TrickMeResultPublisher[T] {
+
+    /**
+     *  Defines a name for the module in the current system.
+     *
+     *  If not defined, it gets a random 36 char string, beginning with a $
+     */
+    val Name: String = "$" + (new Random).nextString(36)
+
+    /**
+     *  Defines a category for the module in the current system.
+     *  Default categories are:
+     *    - PreProcessing
+     *    - Comparison
+     *    - ResultsAnalyzer
+     */
+    val Category: String = "Unknown"
 
     /**
      *  @return - The result stream of the implemented trait

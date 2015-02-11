@@ -16,6 +16,10 @@ import scala.concurrent.Future
  */
 object Starter extends TrickMeResultPublisher[Set[FileRoute]] {
 
+  override val Name = "Starter"
+  
+  override val Category = "PreProcessing"
+
   case class Failure(projectInfo: ProjectInfo, ex: Throwable)
 
   case class Deploy(values: Set[ProjectInfo])

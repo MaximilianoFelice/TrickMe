@@ -51,4 +51,9 @@ trait System extends Actor {
     case Shutdown => context.stop(self)
   }
 
+  /**
+   *  After it stops, stops all children
+   */
+  override def postStop = context.children foreach context.stop
+
 }

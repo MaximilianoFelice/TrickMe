@@ -8,6 +8,15 @@ trait Config {
 
 }
 
+/**
+ *  Gets the initial stream configuration
+ */
 trait InitialStream {
-  def preProcess(elem: String): InitialResult = ???
+
+  /**
+   *  The function that will handle initial stream configuration
+   * @param elem  - A ProjectInfo, provided by the system, that contain the project's specification.
+   * @return      - A Set of InitialResults, that will represent every initial publication
+   */
+  def preProcess(elem: ProjectInfo): InitialResult = ???
 }

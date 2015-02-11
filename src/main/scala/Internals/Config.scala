@@ -11,6 +11,7 @@ import scala.util.{Failure, Success}
  */
 trait Config {
 
+  val filteredPaths = Set("hola")
 }
 
 /**

@@ -1,8 +1,10 @@
 package TrickMe
 package Internals
 
-import akka.actor.{Actor, Props}
+import akka.actor.{Actor, ActorRef, Props}
 import rx.lang.scala.Subject
+
+import scala.util.Try
 
 /**
  * Created by maximilianofelice on 07/02/15.
@@ -10,6 +12,7 @@ import rx.lang.scala.Subject
 
 object System {
 
+  trait ShutDownOperation
   /**
    *  Indicate initial startup
    *  
@@ -18,9 +21,22 @@ object System {
   case class Start(values: Set[Route])
 
   /**
+   *  Requests a value from config to the system
+   *
+   *  @param value - Value name
+   *
+   */
+  case class Config(value: String)
+
+  /**
    *  Message that indicates that an instance of the system should shut down.
    */
-  case object Shutdown
+  case object Shutdown extends ShutDownOperation
+
+  /**
+   *  Message that indicates that an instance of the system ended.
+   */
+  case object Bye extends ShutDownOperation
 
   /**
    *  Subject that will publish reset callbacks registration for every module
@@ -31,14 +47,20 @@ object System {
    *  Will return sequential ID's for every project in the system.
    */
   private var nextID = 0
-  def nextVal = {val id = nextID; nextID += 1; id}
+  protected def nextVal = {val id = nextID; nextID += 1; id}
 
   def props: Props = Props(new System{})
+
+  protected var currSys: Option[ActorRef] = None
+  def currentSystem = currSys
 }
 
 trait System extends Actor {
 
   import TrickMe.Internals.System._
+
+  require{currSys == None}
+  override def preStart = currSys = Some(self)
   
   /**  @return - The starter Actor used to get the initial stream of the system */
   lazy val starter = context.actorOf(Starter.props, "Program_Starter")
@@ -72,7 +94,18 @@ trait System extends Actor {
     /**
      *  Shutdowns the system
      */
-    case Shutdown => context.children foreach (_ ! System.Shutdown); activeCallbacks foreach {_()}; context.stop(self)
+    case Shutdown => context.children foreach (_ ! System.Shutdown); activeCallbacks foreach {_()}; currSys = None; context.stop(self)
+
+    /**
+     *  Answers any Configuration name ask with its corresponding value
+     */
+    case Config(name) => val res = Try{
+      val field = this.getClass.getDeclaredField(name)
+      field.setAccessible(true)
+      field.get(this)
+    }; sender ! res
   }
+
+  override def postStop = {context.system.eventStream.publish(Bye)}
 
 }

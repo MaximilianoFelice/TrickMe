@@ -12,7 +12,7 @@ import scala.util.Success
 /**
  * Created by maximilianofelice on 11/02/15.
  */
-class StarterStream extends TestKit(ActorSystem("Starter_Stream_Tests")) with FunSuiteLike{
+class StarterStream extends TestKit(ActorSystem("Starter_Stream_Tests")) with FunSuiteLike {
 
   test("Starter streams correctly"){
     val sys = system.actorOf(System.props, "System")

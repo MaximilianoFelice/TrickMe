@@ -1,6 +1,6 @@
 package Internals
 
-import TrickMe.Internals.{System, Starter}
+import TrickMe.Internals.Starter
 import TrickMe.Internals.System.Start
 import TrickMe._
 import akka.actor.{ActorRef, ActorSystem, Props}
@@ -44,7 +44,7 @@ class SystemInit extends TestKit(ActorSystem("InitTest")) with FunSuiteLike {
 
     waiter.await()
 
-    main.send(sys, System.Shutdown)
+    main.send(sys, Internals.System.Shutdown)
   }
 
   // TODO: Test error cases

@@ -1,3 +1,5 @@
+package Internals
+
 import TrickMe.Internals.Starter
 import TrickMe.Internals.System.Start
 import TrickMe._

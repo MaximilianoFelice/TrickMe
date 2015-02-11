@@ -3,6 +3,7 @@ package Internals
 
 import java.io.FileNotFoundException
 
+
 import scala.util.{Failure, Success}
 
 /**
@@ -28,8 +29,7 @@ trait InitialStream {
       val route = elem.projectDir
       val addr = new java.io.File(route)
 
-      if (addr.exists && addr.isFile) (elem, Success(Set(addr.getAbsolutePath)))
-      else if (addr.exists && addr.isDirectory) (elem, Success(getFilesRecursively(addr)))
+      if (addr.exists) (elem, Success(Internals.Utils.getFilesRecursively(addr)))
       else (elem, Failure(new FileNotFoundException(s"Couldn't find path: $route")))
 
     } catch {
@@ -39,18 +39,4 @@ trait InitialStream {
     }
   }
 
-  private def getFilesRecursively(dir: java.io.File): Set[String] = {
-    val contents = for {
-      name <- dir.list.toList
-      path = dir.getAbsolutePath + "/" + name
-      javaFile = (new java.io.File(path))
-      if javaFile.exists
-    } yield javaFile
-
-    val (dirs, files) = contents partition {_.isDirectory}
-
-    val res = (files map (_.getAbsolutePath)) :::  (dirs flatMap getFilesRecursively)
-
-    res.toSet
-  }
 }

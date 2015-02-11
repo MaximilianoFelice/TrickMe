@@ -39,10 +39,17 @@ trait InitialStream {
     }
   }
 
-  private def getFilesRecursively(file: java.io.File): Set[String] = {
-    val (dirs, files) = file.list.toList.map(new java.io.File(_)) partition {_.isDirectory}
+  private def getFilesRecursively(dir: java.io.File): Set[String] = {
+    val contents = for {
+      name <- dir.list.toList
+      path = dir.getAbsolutePath + "/" + name
+      javaFile = (new java.io.File(path))
+      if javaFile.exists
+    } yield javaFile
 
-    val res = (dirs map (_.getAbsolutePath)) :::  (dirs flatMap getFilesRecursively)
+    val (dirs, files) = contents partition {_.isDirectory}
+
+    val res = (files map (_.getAbsolutePath)) :::  (dirs flatMap getFilesRecursively)
 
     res.toSet
   }

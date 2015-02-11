@@ -36,7 +36,7 @@ class SystemInit extends TestKit(ActorSystem("InitTest")) with FunSuiteLike {
     var initElems = Set("elem1", "elem 2")
 
 
-    def doAssertion = assert(getNames(elems) == initElems, elems)
+    def doAssertion = {assert(getNames(elems) == initElems, elems); assert(getNames(elems) != Set("hello"))}
 
     initStream.subscribe({elem => elems += elem}, {err => throw err},  {() => waiter{doAssertion}; waiter.dismiss})
 

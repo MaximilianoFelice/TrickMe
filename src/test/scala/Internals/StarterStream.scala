@@ -28,14 +28,19 @@ class StarterStream extends TestKit(ActorSystem("Starter_Stream_Tests")) with Fu
     val expectedRoutes = Set("Cliente/src/Cliente.c", "Cliente/.gitignore", "Servidor/src/Servidor.c", "Servidor/.gitignore", ".gitignore", "makefile", "README.md")
     val absExpRoutes = expectedRoutes map {absDir + _}
 
-    def doAssertions = assert(results.head._2 == Success(absExpRoutes) )
+    def doAssertions = {
+      assert(results.head._2 == Success(absExpRoutes) )
+      assert(results.head._2 != Success("anotherThing"))
+      assert(results.head._2.get.contains(absDir + ".gitignore"))
+    }
 
     initStream.subscribe(onNext = {res => results += res}, onError = {throw _}, onCompleted = {() => waiter(doAssertions); waiter.dismiss})
 
     main.send(sys, System.Start(Set(absDir)))
 
-    main.send(sys, System.Shutdown)
+    waiter.await
 
+    main.send(sys, System.Shutdown)
   }
 
 }

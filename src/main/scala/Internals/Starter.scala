@@ -34,6 +34,8 @@ trait Starter extends Actor with Stash{
 
   import TrickMe.Internals.Starter._
 
+  context.watch(context.parent)
+
   def preProcess(elem: ProjectInfo): InitialResult
 
   def process(elem: ProjectInfo): Unit = Future{preProcess(elem)} recover {case ex => self ! Starter.Failure(elem, ex)} pipeTo self

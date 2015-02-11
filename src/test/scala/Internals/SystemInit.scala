@@ -1,6 +1,6 @@
 package Internals
 
-import TrickMe.Internals.Starter
+import TrickMe.Internals.{System, Starter}
 import TrickMe.Internals.System.Start
 import TrickMe._
 import akka.actor.{ActorRef, ActorSystem, Props}
@@ -31,19 +31,20 @@ class SystemInit extends TestKit(ActorSystem("InitTest")) with FunSuiteLike {
 
     val waiter = new Waiter
 
-    var elems = List[InitialResult]()
+    var elems = Set[InitialResult]()
 
     var initElems = Set("elem1", "elem 2")
 
 
-    def doAssertion = assert(getNames(elems.toSet) == initElems)
+    def doAssertion = assert(getNames(elems) == initElems, elems)
 
-    initStream.subscribe({elem => elems = elem :: elems}, {err => throw err},  {() => waiter{doAssertion}; waiter.dismiss})
+    initStream.subscribe({elem => elems += elem}, {err => throw err},  {() => waiter{doAssertion}; waiter.dismiss})
 
     main.send(sys, Start(initElems))
 
     waiter.await()
 
+    main.send(sys, System.Shutdown)
   }
 
   // TODO: Test error cases

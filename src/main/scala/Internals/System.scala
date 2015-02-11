@@ -1,7 +1,7 @@
 package TrickMe
 package Internals
 
-import akka.actor.Actor
+import akka.actor.{Props, Actor}
 
 /**
  * Created by maximilianofelice on 07/02/15.
@@ -11,6 +11,8 @@ object System {
 
   case class Start(values: Set[Route])
 
+  case object Shutdown
+
   var projects = Set[ProjectInfo]()
 
 
@@ -19,6 +21,8 @@ object System {
    */
   private var nextID = 0
   def nextVal = {val id = nextID; nextID += 1; id}
+
+  def props: Props = Props(new System{})
 }
 
 trait System extends Actor {
@@ -41,6 +45,10 @@ trait System extends Actor {
      */
     case Start(values) => starter ! Starter.Deploy(values map generateProjectInfo)
 
+    /**
+     *  Shutdowns the system
+     */
+    case Shutdown => context.stop(self)
   }
 
 }

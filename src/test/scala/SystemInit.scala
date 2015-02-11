@@ -44,4 +44,6 @@ class SystemInit extends TestKit(ActorSystem("InitTest")) with FunSuiteLike {
 
   }
 
+  // TODO: Test error cases
+
 }

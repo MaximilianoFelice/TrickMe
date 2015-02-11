@@ -1,0 +1,3 @@
+[submodule "src/test/scala/TestCode/so-test-sockets"]
+	path = src/test/scala/TestCode/so-test-sockets
+	url = git@github.com:sisoputnfrba/so-test-sockets.git

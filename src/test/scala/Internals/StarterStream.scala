@@ -25,13 +25,14 @@ class StarterStream extends TestKit(ActorSystem("Starter_Stream_Tests")) with Fu
 
     var results = Set[InitialResult]()
 
-    val expectedRoutes = Set("Cliente/src/Cliente.c", "Cliente/.gitignore", "Servidor/src/Servidor.c", "Servidor/.gitignore", ".gitignore", "makefile", "README.md")
-    val absExpRoutes = expectedRoutes map {absDir + _}
+    val expectedRoutes = Set("Cliente/src/Cliente.c", "Cliente/.gitignore", "Servidor/src/Server.c", "Servidor/.gitignore", ".gitignore", "makefile", "README.md", ".git")
+    val absExpRoutes: Set[FileRoute] = expectedRoutes map {absDir + _}
 
     def doAssertions = {
-      assert(results.head._2 == Success(absExpRoutes) )
-      assert(results.head._2 != Success("anotherThing"))
-      assert(results.head._2.get.contains(absDir + ".gitignore"))
+      val res = results.head._2
+      assert(res == Success(absExpRoutes), "DIFF" + res.get.filterNot(absExpRoutes.contains(_)))
+      assert(res != Success("anotherThing"))
+      assert(res.get.contains(absDir + ".gitignore"))
     }
 
     initStream.subscribe(onNext = {res => results += res}, onError = {throw _}, onCompleted = {() => waiter(doAssertions); waiter.dismiss})

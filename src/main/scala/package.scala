@@ -20,7 +20,7 @@ package object TrickMe {
   /** @return - System initial stream containing [[InitialResult]] reference, composed by:
     *           ProjectInfo - The unique project identifier on the system.
     *           Routes - Containing a set of existent routes inside the Project */
-  lazy val initStream: Observable[InitialResult] = TrickMe.Internals.Starter.resultStream
+  def initStream: Observable[InitialResult] = TrickMe.Internals.Starter.resultStream
 
 
 
@@ -62,9 +62,15 @@ package object TrickMe {
     val Category: String = "Unknown"
 
     /**
-     *  @return - The result stream of the implemented trait
+     *  @return - The current result stream of the implemented trait
      */
-    val resultStream: ReplaySubject[(ProjectInfo, Try[T])] = ReplaySubject[(ProjectInfo, Try[T])]()
+    def resultStream = resStream
+    private var resStream: ReplaySubject[(ProjectInfo, Try[T])] = generateNewStream
+    private def generateNewStream: ReplaySubject[(ProjectInfo, Try[T])] = {
+      val subj = ReplaySubject[(ProjectInfo, Try[T])]()
+      Internals.System.resetCallback.onNext({() => this.shutdown})
+      subj
+    }
 
     /**
      *  Publishes an element in the result stream.
@@ -107,6 +113,12 @@ package object TrickMe {
      * @param throwable - A [[Throwable]] element that will be handled to subscribed modules.
      */
     def gotError(throwable: Throwable) = resultStream.onError(throwable)
+
+    /**
+     *  This is a shutdown method, which generates a completely new stream for the object. It should be used
+     *  carefully, as it could lead to potential inconsistencies.
+     */
+    def shutdown = resStream = generateNewStream
 
   }
 

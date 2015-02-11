@@ -34,7 +34,6 @@ trait Starter extends Actor with Stash{
 
   import TrickMe.Internals.Starter._
 
-  context.watch(context.parent)
 
   def preProcess(elem: ProjectInfo): InitialResult
 
@@ -43,6 +42,8 @@ trait Starter extends Actor with Stash{
   def receive: Receive = {
 
     case Deploy(values) => context.become(waitingResults(values.size)); values foreach {process(_)}
+
+    case System.Shutdown => context.stop(self)
 
   }
 

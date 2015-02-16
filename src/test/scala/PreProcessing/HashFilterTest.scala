@@ -3,7 +3,6 @@ package PreProcessing
 import TrickMe.Internals.Starter.Deploy
 import TrickMe.Internals.System
 import TrickMe.Internals.System.{ShutDownOperation, Start}
-import TrickMe.PreProcessing.HashFilter
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{TestKit, TestProbe}
 import org.scalatest.FunSuiteLike

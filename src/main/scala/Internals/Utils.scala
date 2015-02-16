@@ -1,17 +1,19 @@
 package TrickMe
 package Internals
 
-import TrickMe.PreProcessing.HashFilter._
 import akka.pattern.ask
+import akka.util.Timeout
 
 import scala.concurrent.{Future, Await}
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
 import scala.util.Try
 
 /**
  * Created by maximilianofelice on 11/02/15.
  */
 object Utils {
+
+  implicit val timeout = Timeout(5 seconds)
 
   def getFilesRecursively(dir: java.io.File): Set[String] = {
     val contents = for {

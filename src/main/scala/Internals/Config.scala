@@ -3,8 +3,7 @@ package Internals
 
 import java.io.FileNotFoundException
 
-
-import TrickMe.PreProcessing.HashFilter
+import PreProcessing.HashFilter
 
 import scala.util.{Failure, Success}
 

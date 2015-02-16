@@ -1,7 +1,7 @@
-package TrickMe
 package PreProcessing
 
 import TrickMe.Internals.Utils._
+import TrickMe._
 import akka.util.Timeout
 
 import scala.concurrent.duration._
@@ -15,7 +15,7 @@ import scala.util.{Failure, Success}
  *  Generates a new stream, based on [[Internals.Starter]] initStream, which filters its results
  *  based on a MD5 Hash file comparison.
  */
-object HashFilter extends TrickMeResultPublisher[Set[FileRoute]]{
+package object HashFilter extends TrickMeResultPublisher[Set[FileRoute]]{
 
   implicit val timeout = Timeout(5 seconds)
 

@@ -28,12 +28,13 @@ object Utils {
     res.toSet
   }
 
-  def getConfigValue[T](value: String): Try[T] = {
+  def getConfigValue[T](value: String): Try[T] = Try{
     val future: Future[Try[T]] = (TrickMeSystem ? Internals.System.Config(value)).mapTo[Try[T]]
     val x = Await.ready(future, Duration.Inf)
     val x1 = x.value.get
     val x2 =  x1.flatten
     x2
-  }
+  }.flatten
 
+  def mkabsolute(path: FileRoute): FileRoute = (new java.io.File(path)).getAbsolutePath
 }

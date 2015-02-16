@@ -7,9 +7,6 @@ import TrickMe.PreProcessing.HashFilter
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{TestKit, TestProbe}
 import org.scalatest.FunSuiteLike
-import org.scalatest.concurrent.AsyncAssertions.Waiter
-
-import scala.util.Try
 
 /**
  * Created by maximilianofelice on 11/02/15.
@@ -17,6 +14,7 @@ import scala.util.Try
 class HashFilterTest extends TestKit(ActorSystem("Hash_Filter_Test")) with FunSuiteLike {
 
   trait FullConfig {
+    val activeModules: Set[() => Unit] = Set(HashFilter.preStart _)
     val filteredPaths = Set("foo")
   }
 
@@ -42,18 +40,5 @@ class HashFilterTest extends TestKit(ActorSystem("Hash_Filter_Test")) with FunSu
     main.expectMsg(TrickMe.Internals.System.Bye)
   }
 
-  test("Config errors get handled properly"){
-    val sys = newSystem
-    val main = TestProbe()
-
-    val waiter = new Waiter
-
-    main.send(sys, Start(Set()))
-    start.expectMsg(Deploy(Set()))
-
-    val res: Try[String] = TrickMe.Internals.Utils.getConfigValue("NonExistent")
-
-    assert(res.isFailure)
-  }
 
 }

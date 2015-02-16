@@ -4,6 +4,8 @@ package Internals
 import java.io.FileNotFoundException
 
 
+import TrickMe.PreProcessing.HashFilter
+
 import scala.util.{Failure, Success}
 
 /**
@@ -11,6 +13,7 @@ import scala.util.{Failure, Success}
  */
 trait Config {
 
+  val activeModules: Set[Function0[Unit]] = Set(HashFilter.preStart _)
   val filteredPaths = Set("hola")
 }
 

@@ -4,7 +4,7 @@ package Internals
 import akka.actor.{Actor, ActorRef, Props}
 import rx.lang.scala.Subject
 
-import scala.util.Try
+import scala.util.{Success, Failure, Try}
 
 /**
  * Created by maximilianofelice on 07/02/15.
@@ -60,7 +60,21 @@ trait System extends Actor {
   import TrickMe.Internals.System._
 
   require{currSys == None}
-  override def preStart = currSys = Some(self)
+  override def preStart = {
+    currSys = Some(self)
+    //startModules
+  }
+
+  /**
+   *  Module startup: Calls functions in Config: ActiveModules
+   */
+  private def startModules: Unit = {
+    val funcs: Try[Set[() => Unit]] = getValue("activeModules").asInstanceOf[Try[Set[() => Unit]]]
+    funcs match {
+      case Success(funcs) => funcs foreach (_())
+      case Failure(_) => () /* No modules up */
+    }
+  }
   
   /**  @return - The starter Actor used to get the initial stream of the system */
   lazy val starter = context.actorOf(Starter.props, "Program_Starter")
@@ -82,8 +96,22 @@ trait System extends Actor {
    *  Generates [[ProjectInfo]] instance for a route
    * @return - A projectInfo instance for the route.
    */
-  def generateProjectInfo(route: String): ProjectInfo = ProjectInfo(route, nextID)
-  
+  private def generateProjectInfo(route: String): ProjectInfo = ProjectInfo(route, nextID)
+
+  /**
+   *  Gets a config value by reflection.
+   *
+   *  @param value  - Config accessor name
+   *
+   *  @return       - A Try[AnyRef] with the asked value, or an error
+   */
+  private def getValue(value: String): Try[AnyRef] = Try{
+    val field = this.getClass.getDeclaredField(value)
+    field.setAccessible(true)
+    val x = field.get(this)
+    x
+  }
+
   def receive: Receive = {
 
     /**
@@ -99,11 +127,7 @@ trait System extends Actor {
     /**
      *  Answers any Configuration name ask with its corresponding value
      */
-    case Config(name) => val res = Try{
-      val field = this.getClass.getDeclaredField(name)
-      field.setAccessible(true)
-      field.get(this)
-    }; sender ! res
+    case Config(name) => sender ! getValue(name)
   }
 
   override def postStop = {context.system.eventStream.publish(Bye)}

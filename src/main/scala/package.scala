@@ -2,12 +2,12 @@ import akka.actor.ActorRef
 import rx.lang.scala.Observable
 import rx.lang.scala.subjects.ReplaySubject
 
-import scala.util.{Random, Failure, Success, Try}
+import scala.util.{Failure, Random, Success, Try}
 
 /**
  * Created by maximilianofelice on 07/02/15.
  */
-package object TrickMe {
+package object TrickMe{
 
   type Route = String
   type FileRoute = String
@@ -123,6 +123,11 @@ package object TrickMe {
      *  carefully, as it could lead to potential inconsistencies.
      */
     def shutdown = resStream = generateNewStream
+
+    /**
+     *  Initializes the module. Must be specified at Config.
+     */
+    def preStart: Unit = ()
 
   }
 

@@ -3,7 +3,6 @@ package PreProcessing
 import java.io.{File, FileInputStream}
 
 import TrickMe.Internals.Utils._
-import FileOpener._
 import TrickMe._
 import akka.util.Timeout
 
@@ -21,6 +20,8 @@ import scala.util.{Failure, Success}
 object HashFilter extends TrickMeResultPublisher[Set[File]]{
 
   implicit val timeout = Timeout(5 seconds)
+
+  FileOpener.resultStream.subscribe(doOnNext _, gotError _, completed _)
 
   lazy val toFilter: Set[String] = getConfigValue[Set[String]]("filteredPaths") match {
     case Success(elem) => elem
@@ -53,10 +54,5 @@ object HashFilter extends TrickMeResultPublisher[Set[File]]{
       if (!filterdElems.isEmpty) publish((pi, Success(filterdElems)))
     }
   }
-
-
-  // TODO: Implement a callback method to solve companion object's lazy initialization
-
-
 
 }

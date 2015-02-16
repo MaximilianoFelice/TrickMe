@@ -5,9 +5,12 @@ import TrickMe.Internals.System
 import TrickMe.Internals.System.{ShutDownOperation, Start}
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{TestKit, TestProbe}
+import org.scalatest.concurrent.AsyncAssertions.Waiter
 import org.scalatest.{BeforeAndAfter, FunSuiteLike}
 
 import scala.concurrent.duration._
+
+import TrickMe._
 
 /**
  * Created by maximilianofelice on 11/02/15.
@@ -62,6 +65,33 @@ class HashFilterTest extends TestKit(ActorSystem("Hash_Filter_Test")) with FunSu
     assert(HashFilter.filterHash.contains(makefileHash))
   }
 
+  test("Hash Filter filters all neccesary paths"){
+    var results = Set[OpenProject]()
+
+    val projectPath = new java.io.File("").getAbsolutePath
+    val testKitPath = "/src/test/scala/TestCode/so-test-sockets/"
+    val absDir = projectPath + testKitPath
+
+    val waiter = new Waiter
+
+    main.send(sys, Start(Set(absDir)))
+
+    def doAssertions = {
+      val elem: OpenProject = results.head
+      assert(elem._2.isSuccess)
+      val paths = elem._2.get map (_.getAbsolutePath)
+      assert(!paths.contains("/src/test/scala/TestCode/so-test-sockets/makefile"))
+      assert(paths.contains(projectPath + "Cliente/src/Cliente.c"))
+    }
+
+    HashFilter.resultStream.subscribe(
+      onNext = {elem => results += elem},
+      onError = {err => throw err},
+      onCompleted = {() => waiter(doAssertions); waiter.dismiss} )
+
+
+
+  }
 
 
 

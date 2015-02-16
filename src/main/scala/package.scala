@@ -1,3 +1,5 @@
+import java.io.File
+
 import akka.actor.ActorRef
 import rx.lang.scala.Observable
 import rx.lang.scala.subjects.ReplaySubject
@@ -11,6 +13,7 @@ package object TrickMe{
 
   type Route = String
   type FileRoute = String
+  type OpenProject = (ProjectInfo, Try[Set[File]])
 
   class NoSystemUpException extends Exception
   def TrickMeSystem: ActorRef = TrickMe.Internals.System.currentSystem.getOrElse(throw new NoSystemUpException)

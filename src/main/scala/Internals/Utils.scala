@@ -38,5 +38,5 @@ object Utils {
     x2
   }.flatten
 
-  def mkabsolute(path: FileRoute): FileRoute = (new java.io.File(path)).getAbsolutePath
+  def mkabsolute(path: FileRoute): FileRoute = (new java.io.File(path.stripPrefix("/"))).getAbsolutePath
 }

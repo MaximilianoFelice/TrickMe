@@ -1,15 +1,14 @@
 package PreProcessing
 
-import java.io.File
+import java.io.{File, FileInputStream}
 
 import TrickMe.Internals.Utils._
+import TrickMe.PreProcessing.FileOpener._
 import TrickMe._
 import akka.util.Timeout
 
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
-
-import FileOpener._
 
 /**
  * Created by maximilianofelice on 11/02/15.
@@ -19,7 +18,7 @@ import FileOpener._
  *  Generates a new stream, based on [[Internals.Starter]] initStream, which filters its results
  *  based on a MD5 Hash file comparison.
  */
-package object HashFilter extends TrickMeResultPublisher[Set[File]]{
+object HashFilter extends TrickMeResultPublisher[Set[File]]{
 
   implicit val timeout = Timeout(5 seconds)
 
@@ -28,7 +27,12 @@ package object HashFilter extends TrickMeResultPublisher[Set[File]]{
     case Failure(ex) => gotError(ex); throw ex
   }
 
-  def getHash(path: java.io.File): String = ???
+  def getHash(path: java.io.File): String = {
+    val stream = new FileInputStream(path)
+    val res = org.apache.commons.codec.digest.DigestUtils.md5Hex(stream)
+    stream.close()
+    res
+  }
 
   lazy val filterRoutes = toFilter map mkabsolute
 
@@ -53,4 +57,3 @@ package object HashFilter extends TrickMeResultPublisher[Set[File]]{
 
 
 }
-

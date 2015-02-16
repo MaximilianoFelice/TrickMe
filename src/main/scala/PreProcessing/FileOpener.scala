@@ -7,9 +7,9 @@ import TrickMe._
 import scala.util.{Failure, Success, Try}
 
 /**
- * Created by maximilianofelice on 15/02/15.
+ * Created by maximilianofelice on 16/02/15.
  */
-package object FileOpener extends TrickMeResultPublisher[Set[File]] {
+object FileOpener extends TrickMe.TrickMeResultPublisher[Set[File]] {
   type OpenProject = (ProjectInfo, Try[Set[File]])
 
   initStream.subscribe{ elem => elem match {

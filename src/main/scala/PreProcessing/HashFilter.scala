@@ -3,7 +3,7 @@ package PreProcessing
 import java.io.{File, FileInputStream}
 
 import TrickMe.Internals.Utils._
-import TrickMe.PreProcessing.FileOpener._
+import FileOpener._
 import TrickMe._
 import akka.util.Timeout
 

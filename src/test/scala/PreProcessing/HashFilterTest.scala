@@ -13,7 +13,7 @@ import org.scalatest.FunSuiteLike
 class HashFilterTest extends TestKit(ActorSystem("Hash_Filter_Test")) with FunSuiteLike {
 
   trait FullConfig {
-    val activeModules: Set[() => Unit] = Set(HashFilter.preStart _)
+    val activeModules: Set[() => Unit] = Set()
     val filteredPaths = Set("foo")
   }
 

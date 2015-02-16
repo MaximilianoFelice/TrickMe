@@ -17,3 +17,6 @@ libraryDependencies += "io.reactivex" %% "rxscala" % "0.23.1"
 libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.3.9"
 
 libraryDependencies += "com.typesafe.akka" %% "akka-testkit" % "2.3.9"
+
+
+libraryDependencies += "commons-codec" % "commons-codec" % "1.10"

@@ -46,7 +46,13 @@ class HashFilterTest extends TestKit(ActorSystem("Hash_Filter_Test")) with FunSu
     system.eventStream.subscribe(main.ref, classOf[ShutDownOperation])
   }
 
-  
+  test("Hash gets loaded properly"){
+    val makefileHash = "0b2e7256362de901a97de587e54290b8"
+
+    val makeRoute = TrickMe.Internals.Utils.mkabsolute("src/test/scala/TestCode/so-test-sockets/makefile")
+
+    assert(HashFilter.getHash(new java.io.File(makeRoute)) == makefileHash)
+  }
 
 
 

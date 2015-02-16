@@ -5,12 +5,12 @@ import TrickMe.Internals.System
 import TrickMe.Internals.System.{ShutDownOperation, Start}
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{TestKit, TestProbe}
-import org.scalatest.FunSuiteLike
+import org.scalatest.{BeforeAndAfter, FunSuiteLike}
 
 /**
  * Created by maximilianofelice on 11/02/15.
  */
-class HashFilterTest extends TestKit(ActorSystem("Hash_Filter_Test")) with FunSuiteLike {
+class HashFilterTest extends TestKit(ActorSystem("Hash_Filter_Test")) with FunSuiteLike with BeforeAndAfter{
 
   trait FullConfig {
     val activeModules: Set[() => Unit] = Set()
@@ -23,10 +23,20 @@ class HashFilterTest extends TestKit(ActorSystem("Hash_Filter_Test")) with FunSu
     override lazy val starter = start.ref
   }), "New_System")
 
-  test("Config gets loaded properly"){
-    val sys = newSystem
-    val main = TestProbe()
+  var sys: ActorRef = null
+  val main = TestProbe()
 
+  before{
+    sys = newSystem
+    system.eventStream.subscribe(main.ref, classOf[ShutDownOperation])
+  }
+
+  after{
+    main.send(sys, System.Shutdown)
+    main.expectMsg(TrickMe.Internals.System.Bye)
+  }
+
+  test("Config gets loaded properly"){
     main.send(sys, Start(Set()))
     start.expectMsg(Deploy(Set()))
 
@@ -34,10 +44,11 @@ class HashFilterTest extends TestKit(ActorSystem("Hash_Filter_Test")) with FunSu
     assert(HashFilter.toFilter != Set("bar"))
 
     system.eventStream.subscribe(main.ref, classOf[ShutDownOperation])
-    main.send(sys, System.Shutdown)
-
-    main.expectMsg(TrickMe.Internals.System.Bye)
   }
+
+  
+
+
 
 
 }

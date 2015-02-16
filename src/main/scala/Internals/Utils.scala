@@ -16,6 +16,7 @@ object Utils {
   implicit val timeout = Timeout(5 seconds)
 
   def getFilesRecursively(dir: java.io.File): Set[String] = {
+    if (dir.isFile) return Set(dir.getAbsolutePath)
     val contents = for {
       name <- dir.list.toList
       path = dir.getAbsolutePath + "/" + name

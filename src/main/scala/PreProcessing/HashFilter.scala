@@ -36,7 +36,10 @@ object HashFilter extends TrickMeResultPublisher[Set[File]]{
 
   lazy val filterRoutes = toFilter map mkabsolute
 
-  lazy val filterFiles: Set[FileRoute] = (filterRoutes map (new java.io.File(_))) flatMap getFilesRecursively
+  lazy val filterFiles: Set[FileRoute] = {
+    val files = filterRoutes map (new java.io.File(_))
+    files flatMap getFilesRecursively
+  }
 
   lazy val filterHash: Set[String] = (filterFiles map (new java.io.File(_))) map getHash
 

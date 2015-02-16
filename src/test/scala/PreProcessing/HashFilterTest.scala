@@ -7,6 +7,8 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{TestKit, TestProbe}
 import org.scalatest.{BeforeAndAfter, FunSuiteLike}
 
+import scala.concurrent.duration._
+
 /**
  * Created by maximilianofelice on 11/02/15.
  */
@@ -14,8 +16,10 @@ class HashFilterTest extends TestKit(ActorSystem("Hash_Filter_Test")) with FunSu
 
   trait FullConfig {
     val activeModules: Set[() => Unit] = Set()
-    val filteredPaths = Set("foo")
+    val filteredPaths = Set("/src/test/scala/TestCode/so-test-sockets/makefile")
   }
+
+  val makefileHash = "0b2e7256362de901a97de587e54290b8"
 
   val start = TestProbe()
 
@@ -28,30 +32,34 @@ class HashFilterTest extends TestKit(ActorSystem("Hash_Filter_Test")) with FunSu
 
   before{
     sys = newSystem
-    system.eventStream.subscribe(main.ref, classOf[ShutDownOperation])
   }
 
   after{
+    main watch sys
     main.send(sys, System.Shutdown)
     main.expectMsg(TrickMe.Internals.System.Bye)
+    main.expectTerminated(sys, 5 seconds)
   }
 
   test("Config gets loaded properly"){
     main.send(sys, Start(Set()))
     start.expectMsg(Deploy(Set()))
 
-    assert(HashFilter.toFilter == Set("foo"))
-    assert(HashFilter.toFilter != Set("bar"))
+    assert(HashFilter.toFilter == Set("/src/test/scala/TestCode/so-test-sockets/makefile"))
+    assert(HashFilter.toFilter != Set("Bar"))
 
     system.eventStream.subscribe(main.ref, classOf[ShutDownOperation])
   }
 
   test("Hash gets loaded properly"){
-    val makefileHash = "0b2e7256362de901a97de587e54290b8"
 
     val makeRoute = TrickMe.Internals.Utils.mkabsolute("/src/test/scala/TestCode/so-test-sockets/makefile")
 
     assert(HashFilter.getHash(new java.io.File(makeRoute)) == makefileHash)
+  }
+
+  test("Hash Filter gets hashes to filter correctly"){
+    assert(HashFilter.filterHash.contains(makefileHash))
   }
 
 
